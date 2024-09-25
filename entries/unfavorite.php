@@ -1,31 +1,55 @@
 <?php
 include '../config.php';
-session_start();
+include_once("../includes/php-jwt/JWT.php");
+include_once("../includes/php-jwt/Key.php");
 
-header('Content-Type: application/json');
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$secretKey = "chave_secreta";
 
+header("Access-Control-Allow-Origin: http://localhost:4200");
+header("Access-Control-Allow-Methods: DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+if (!isset(getallheaders()['Authorization'])) {
+    http_response_code(401);
+    echo json_encode(["error" => "Usuário não autenticado."]);
+    exit;
+}
+$authHeader = getallheaders()['Authorization'];
+list($type, $token) = explode(" ", $authHeader, 2);
+
+if (strcasecmp($type, 'Bearer') !== 0) {
+    http_response_code(401);
+    echo json_encode(["error" => "Tipo de token inválido."]);
+    exit;
+}
+if (!isset($_GET['word']) || empty($_GET['word'])) {
+    http_response_code(400);
+    echo json_encode(["error" => "Parâmetro 'word' é obrigatório."]);
+    exit;
+}
 if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     http_response_code(405);
     echo json_encode(["error" => "Método não permitido. Use DELETE."]);
     exit;
 }
-
 if (!isset($_GET['word']) || empty($_GET['word'])) {
     http_response_code(400);
     echo json_encode(["error" => "Parâmetro 'word' é obrigatório."]);
     exit;
 }
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(["error" => "Usuário não autenticado."]);
-    exit;
-}
-
-$word = urlencode($_GET['word']);
-$user_id = $_SESSION['user_id'];
-
 try {
+    $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+    $user_id = $decoded->data->id;
+    $word = urlencode($_GET['word']);
+
     $checkQuery = "SELECT * FROM favorites WHERE word = :word AND user_id = :user_id";
     $stmt = $pdo->prepare($checkQuery);
     $stmt->execute([':word' => urldecode($word), ':user_id' => $user_id]);

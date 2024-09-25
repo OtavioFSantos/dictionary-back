@@ -3,8 +3,6 @@ include '../config.php';
 include_once("../includes/php-jwt/JWT.php");
 include_once("../includes/php-jwt/Key.php");
 
-session_start();
-
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 $secretKey = "chave_secreta";
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
 if (!isset($_GET['word']) || empty($_GET['word'])) {
     http_response_code(400);
     echo json_encode(["error" => "Parâmetro 'word' é obrigatório."]);
