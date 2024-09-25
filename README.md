@@ -1,6 +1,28 @@
 # Fullstack Challenge - Dictionary
 
-## Introdução
+### Ferramentas utilizadas
+
+- Backend: PHP e MySQL
+- Frontend: Angular e Typescript
+
+### Como instalar
+
+- Frontend
+
+```bash
+git clone https://github.com/OtavioFSantos/dictionary-front.git
+npm i
+ng serve
+```
+
+- Backend
+
+```bash
+git clone https://github.com/OtavioFSantos/dictionary-back.git
+```
+No caso do backend, também é preciso baixar algum software para que não seja preciso baixar e configurar diversos componentes. Ex. XAMPP, WAMP, LAMP, etc.
+
+## Descrição do desafio
 
 Este é um desafio para que possamos ver as suas habilidades como Fullstack Developer.
 
